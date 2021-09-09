@@ -83,12 +83,18 @@ module ietf-ucpe-lne-properties {
 			must "./supporting-node"{
 				description "supporting-node is mandatory";
 			}
-			
-			leaf vnfd {
-				type leafref{
-					path "/nfv/vnfd/id";
+			container etsi{	
+				leaf vnfd {
+					type leafref{
+						path "/nfv/vnfd/id";
+					}
 				}
-			}	
+				leaf vdu {
+					type leafref{
+						path "/nfv/vnfd[id=current()/../vnfd]/vdu/id";
+					}
+				}
+			}
 			leaf supporting-node {
 				type leafref{
 					path "/nw:networks/nw:network/nw:node/nw:node-id";
@@ -96,6 +102,112 @@ module ietf-ucpe-lne-properties {
 				description
 					"The reference to a physical node which hosts the logical element";
 			}
+			leaf uuid{
+				type enumeration{
+					enum non-persistent;
+					enum permanent;
+					enum custom;
+				}
+				description
+					"UUID of VM(RFC4122): used also to apply license";
+			}
+			leaf uuid-custom-value{
+				type string{
+					pattern '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-'
+						+ '[0-9a-fA-F]{4}-[0-9a-fA-F]{12}';
+				}
+			}
+			leaf persistance-id{
+				type string{
+					pattern '[0-9a-fA-F]{8}';
+				}	
+			}
+			container pci-passthrough{
+				list device {
+					key "device-name";
+					leaf device-name {
+						type string;
+						description
+							"Name of the device";
+					}
+					leaf vendor-id{
+						type string{
+							pattern '[0-9a-fA-F{4}]';
+						}
+						description 'hexadecimal vendorID [0000,FFFF]';
+					}
+					leaf device-id{
+						type string{
+							pattern '[0-9a-fA-F{4}]';
+						}
+						description 'hexadecimal deviceID [0000,FFFF]';
+					}
+					leaf device-index{
+						type int64;
+					}
+				}
+			}
+			list sf-cp-params {
+				key "sf-connection-point-id";
+				leaf sf-connection-point-id {
+					type string;
+					description
+						"Name of the connector";
+				}
+      	container io-acceleration{
+					leaf interface-type{
+						type enumeration{
+							enum ethernet;
+							enum vhostuser;
+						}
+					}
+					leaf interface-model{
+						type enumeration{
+							enum virtio; 
+							enum e1000;
+							enum net2k-pci;
+							enum i82551;
+							enum i82557b;
+							enum i82559er;
+							enum rtl8139;
+							enum pcnet;
+						}
+					}
+					leaf number-of-queues{
+						type uint64{
+							range "1..256";
+						}
+						description
+							"The numer of queues in case if Vhost is selected";
+					}
+					description
+		        "Input/Output acceleration techniques configuration";
+		    }
+				container mac-params{
+					leaf mac-type{
+						type enumeration{
+							enum permanent;
+							enum custom;
+							enum non-persistent;
+							enum bound-to-configID;
+						}
+						description
+							"MAC address parameters";
+					}
+					leaf custom-mac-address{
+							type string{
+								pattern '[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5}';
+							}
+						description
+							"In case custom MAC is selected, specify the MAC address";
+					}
+					description
+						"MAC address parameters";
+				}
+				description
+					"Connection points parameters of logical-network-element";
+			}
+	
 			container simplified-lne-props{
 				list sf-connection-points {
 					key "sf-connection-point-id";

@@ -14,6 +14,11 @@ module ietf-ucpe-node-type {
 		  "RFC 8345: YANG Data Model for Network Topologies";
 	}
 
+	import ietf-network-topology{
+		prefix nt;
+		reference
+		  "RFC 8345: YANG Data Model for Network Topologies";
+	}
   organization
     "SFR";
   contact
@@ -59,6 +64,56 @@ module ietf-ucpe-node-type {
 		
     		description
       		"Properties of network instance";
+			}
+		}
+	
+  augment "/nw:networks/nw:network/nw:node" {
+    	container node-properties-ucpe {
+				description
+      		"Properties of node";
+			}
+		}
+
+  augment "/nw:networks/nw:network/nw:node/nt:termination-point" {
+    	container tp-properties {
+				leaf direct-access{
+					type boolean;
+					description
+						"Direct access";
+				}
+				container ethernet{
+					leaf duplex{
+						type enumeration{
+							enum full;
+							enum half;
+						}
+					}
+					description
+						"Ethernet";
+				}
+				leaf driver{
+					type string;
+					description
+				 		"Driver";	
+				}
+				leaf mtu{
+					type string;
+					description
+						"MTU";
+				}
+				leaf name{
+					type string;
+					description
+						"Name";
+				}
+				leaf type{
+					type enumeration{
+						enum dpdk;
+						enum ethernetCsmacd;
+					}
+				}
+    		description
+      		"Properties of termination point";
 			}
 		}
 }
